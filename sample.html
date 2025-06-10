@@ -1,0 +1,3302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <div class="header">
+        <h2>ADMIN DASHBOARD</h2>
+        <button class="hamburger">☰</button>
+        <div class="header-links">
+            <a href="#total-profit" data-page="total-profit" class="active"><span class="icon">📈</span> Total Profit</a>
+            <a href="#monthly-profit" data-page="monthly-profit"><span class="icon">📅</span> Monthly Profit</a>
+            <a href="#weekly-profit" data-page="weekly-profit"><span class="icon">📆</span> Weekly Profit</a>
+            <a href="#daily-profit" data-page="daily-profit"><span class="icon">🕒</span> Daily Profit</a>
+            <a href="#total-users" data-page="total-users"><span class="icon">🧑</span> Total Users</a>
+            <a href="#monthly-paid-users" data-page="monthly-paid-users"><span class="icon">📅</span> Monthly Paid Users</a>
+            <a href="#weekly-paid-users" data-page="weekly-paid-users"><span class="icon">📆</span> Weekly Paid Users</a>
+            <a href="#daily-paid-users" data-page="daily-paid-users"><span class="icon">💰</span> Daily Paid Users</a>
+            <a href="#monthly-demo-users" data-page="monthly-demo-users"><span class="icon">📅</span> Monthly Demo Users</a>
+            <a href="#daily-demo-users" data-page="daily-demo-users"><span class="icon">🕒</span> Daily Demo Users</a>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="profile">
+            <img src="pics/iheb-ab-OBufvGMaBaQ-unsplash.jpg" alt="Profile Picture">
+            <h3>Sanjay</h3>
+            <p>ADMIN_0021</p>
+        </div>
+        <a href="#main-users" data-page="main-users"><span class="icon">🧑</span> Main User List</a>
+        <a href="#total-paid-subscribers" data-page="total-paid-subscribers"><span class="icon">💳</span> Total Paid Subscriber List</a>
+        <a href="#total-demo-subscribers" data-page="total-demo-subscribers"><span class="icon">📊</span> Total Demo Subscribers List</a>
+        <a href="#monthly-paid-subscribers" data-page="monthly-paid-subscribers"><span class="icon">📅</span> Monthly Paid Subscriber List</a>
+        <a href="#daily-paid-subscribers" data-page="daily-paid-subscribers"><span class="icon">💰</span> Daily Paid Subscriber List</a>
+        <a href="#daily-demo-subscribers" data-page="daily-demo-subscribers"><span class="icon">🕒</span> Daily Demo Subscribers List</a>
+        <a href="#logout" data-page="logout"><span class="icon">🚪</span> Logout</a>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <!-- Content will be loaded dynamically -->
+    </div>
+
+    <div class="modal" id="view-modal">
+        <div class="modal-content">
+            <button class="close-btn" id="close-view-modal">✖</button>
+            <h3>Subscriber Details</h3>
+            <div id="view-details"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <button class="close-btn" id="close-add-modal">✖</button>
+            <h3>Add New Member</h3>
+            <form id="add-member-form">
+                <label for="slNo">S.No</label>
+                <input type="number" id="slNo" name="slNo" readonly>
+
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+
+                <label for="referralId">Referral ID</label>
+                <input type="text" id="referralId" name="referralId" required>
+
+                <label for="tradingId">Trading View ID</label>
+                <input type="text" id="tradingId" name="tradingId" required>
+
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+
+                <label for="email">Email ID</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="plan">Plan</label>
+                <select id="plan" name="plan" required>
+                    <option value="Daily">Daily</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Premium">Premium</option>
+                    <option value="Daily Demo">Daily Demo</option>
+                </select>
+
+                <label for="pricing" class="paid-field">Pricing</label>
+                <input type="text" id="pricing" name="pricing" class="paid-field">
+
+                <label for="paidConfirm" class="paid-field">Paid Confirm</label>
+                <select id="paidConfirm" name="paidConfirm" class="paid-field">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+
+                <label for="expiryDate">Expiry Date</label>
+                <input type="date" id="expiryDate" name="expiryDate" required>
+
+                <label for="remainingDays">Remaining Days</label>
+                <input type="number" id="remainingDays" name="remainingDays" required>
+
+                <button type="submit" class="submit-btn">Add Member</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+    overflow-x: hidden;
+}
+
+/* Gradient Animation for Header and Sidebar Only */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        #E6E6FA 0%,   /* Light Lavender */
+        #D4F1F4 14%,  /* Pale Mint */
+        #FFDAB9 28%,  /* Light Peach */
+        #E0FFFF 42%,  /* Light Sky Blue */
+        #F5F5F5 56%,  /* Creamy White */
+        #F3E5F5 70%,  /* Pale Lilac */
+        #FFE4E1 85%,  /* Misty Rose */
+        #FFFFF0 100%  /* Light Ivory */
+    );
+    background-size: 200% 100%;
+    animation: gradientShift 10s ease-in-out infinite;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.header h2 {
+    font-size: 19px;
+    font-weight: 600;
+    margin-right: 15px;
+    color: black;
+    font-size: bold;
+}
+
+.hamburger {
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: black;
+    margin-right: 15px;
+    transition: transform 0.3s ease;
+}
+
+.hamburger:hover {
+    transform: scale(1.1);
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tabs button {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.tabs button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.tabs button.active {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.sidebar {
+    width: 250px;
+    background: linear-gradient(
+        180deg,
+        #E6E6FA 0%,   /* Light Lavender */
+        #D4F1F4 14%,  /* Pale Mint */
+        #E0FFFF 42%,  /* Light Sky Blue */
+        #F5F5F5 56%,  /* Creamy White */
+        #F3E5F5 70%,  /* Pale Lilac */
+        #FFE4E1 85%,  /* Misty Rose */
+        #FFFFF0 100%  /* Light Ivory */
+    );
+    background-size: 200% 100%;
+    animation: gradientShift 10s ease-in-out infinite;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    z-index: 900;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar .profile {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 120px;
+}
+
+.sidebar .profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.sidebar .profile h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: black;
+}
+
+.sidebar .profile p {
+    font-size: 14px;
+    color: black;
+}
+
+.sidebar a {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    padding: 12px;
+    width: 100%;
+    text-align: center;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar a.active {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.sidebar a .icon {
+    font-size: 18px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+    margin-left: 0;
+    margin-top: 70px;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    width: calc(100% - 0px);
+}
+
+.main-content.shifted {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+}
+
+/* Page Banner Styles */
+.page-banner {
+    width: 100%;
+    background-color: #1E3A8A;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.page-banner h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+}
+
+.summary {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.summary-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    flex: 1;
+    text-align: center;
+    min-width: 200px;
+}
+
+.summary-card h4 {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+.summary-card p {
+    font-size: 24px;
+    font-weight: 600;
+    color: #6a0dad;
+}
+
+.controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-bar {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-bar:focus {
+    border-color: #6a0dad;
+    box-shadow: 0 0 5px rgba(106, 13, 173, 0.3);
+}
+
+.add-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s, transform 0.1s;
+}
+
+.add-btn:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.add-btn:active {
+    transform: translateY(0);
+}
+
+.table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+td {
+    color: #4b5563;
+    font-size: 14px;
+}
+
+tr:hover {
+    background-color: #f9fafb;
+}
+
+.action-icon {
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.delete-icon:hover {
+    color: #dc3545;
+    transform: scale(1.2);
+}
+
+.view-icon:hover {
+    color: #007bff;
+    transform: scale(1.2);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+    margin-bottom: 15px;
+    color: #374151;
+    font-size: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+
+.modal-content p {
+    margin: 10px 0;
+    color: #4b5563;
+    font-size: 15px;
+}
+
+.modal-content p strong {
+    color: #374151;
+}
+
+.modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.modal-content input, .modal-content select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.modal-content input:focus, .modal-content select:focus {
+    border-color: #6a0dad;
+}
+
+.modal-content .submit-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 15px;
+    transition: background 0.3s, transform 0.1s;
+}
+
+.modal-content .submit-btn:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.modal-content .submit-btn:active {
+    transform: translateY(0);
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #374151;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #dc3545;
+}
+
+.header-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.header-links::-webkit-scrollbar {
+    display: none;
+}
+
+.header-links a {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.header-links a:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.header-links a.active {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.header-links a .icon {
+    font-size: 16px;
+}
+
+.profit-cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.user-cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.profit-card, .user-card {
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    width: 180px;
+    text-align: center;
+    border-left: 4px solid;
+    transition: transform 0.2s ease;
+}
+
+.profit-card:hover, .user-card:hover {
+    transform: translateY(-3px);
+}
+
+.profit-card.year-2023 { border-left-color: #ff6f61; }
+.profit-card.year-2024 { border-left-color: #28a745; }
+.profit-card.year-2025 { border-left-color: #007bff; }
+.profit-card.q1 { border-left-color: #6a0dad; }
+.profit-card.q2 { border-left-color: #ffca28; }
+.profit-card.jan { border-left-color: #28a745; }
+.profit-card.feb { border-left-color: #007bff; }
+.profit-card.mar { border-left-color: #6a0dad; }
+.profit-card.apr { border-left-color: #ffca28; }
+.profit-card.week-apr { border-left-color: #ff6f61; }
+
+.user-card.year-2023 { border-left-color: #ff6f61; }
+.user-card.year-2024 { border-left-color: #28a745; }
+.user-card.year-2025 { border-left-color: #007bff; }
+.user-card.q1 { border-left-color: #6a0dad; }
+.user-card.q2 { border-left-color: #ffca28; }
+.user-card.jan { border-left-color: #28a745; }
+.user-card.feb { border-left-color: #007bff; }
+.user-card.mar { border-left-color: #6a0dad; }
+.user-card.apr { border-left-color: #ffca28; }
+.user-card.week-apr { border-left-color: #ff6f61; }
+.user-card.day-19 { border-left-color: #ff6f61; }
+.user-card.day-20 { border-left-color: #28a745; }
+.user-card.day-21 { border-left-color: #007bff; }
+.user-card.day-22 { border-left-color: #6a0dad; }
+
+.profit-card h4, .user-card h4 {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.profit-card p, .user-card p {
+    font-size: 18px;
+    font-weight: 600;
+    color: #6a0dad;
+}
+
+.charts-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.chart-container {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 15px;
+    width: 500px;
+    height: 350px;
+}
+    </style>
+
+    <script>
+       console.log("Dashboard1.js is running!");
+
+// Initialize localStorage data
+const initializeData = () => {
+    if (!localStorage.getItem("dailyPaidSubscribers")) {
+        localStorage.setItem("dailyPaidSubscribers", JSON.stringify([]));
+    }
+    if (!localStorage.getItem("monthlyPaidSubscribers")) {
+        localStorage.setItem("monthlyPaidSubscribers", JSON.stringify([]));
+    }
+    if (!localStorage.getItem("totalPaidSubscribers")) {
+        localStorage.setItem("totalPaidSubscribers", JSON.stringify([]));
+    }
+    if (!localStorage.getItem("dailyDemoSubscribers")) {
+        localStorage.setItem("dailyDemoSubscribers", JSON.stringify([]));
+    }
+    if (!localStorage.getItem("totalDemoSubscribers")) {
+        localStorage.setItem("totalDemoSubscribers", JSON.stringify([]));
+    }
+};
+
+let dailyPaidSubscribers = JSON.parse(localStorage.getItem("dailyPaidSubscribers")) || [];
+let monthlyPaidSubscribers = JSON.parse(localStorage.getItem("monthlyPaidSubscribers")) || [];
+let totalPaidSubscribers = JSON.parse(localStorage.getItem("totalPaidSubscribers")) || [];
+let dailyDemoSubscribers = JSON.parse(localStorage.getItem("dailyDemoSubscribers")) || [];
+let totalDemoSubscribers = JSON.parse(localStorage.getItem("totalDemoSubscribers")) || [];
+
+const pages = {
+    "total-users": `
+        <div class="page-banner">
+            <h3>Total Users (2023-2025)</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Users</h4>
+                <p id="total-users-amount">0</p>
+            </div>
+        </div>
+        <div class="user-cards">
+            <div class="user-card year-2023">
+                <h4>2023 Users</h4>
+                <p id="year-2023-users">0</p>
+            </div>
+            <div class="user-card year-2024">
+                <h4>2024 Users</h4>
+                <p id="year-2024-users">0</p>
+            </div>
+            <div class="user-card year-2025">
+                <h4>2025 Users</h4>
+                <p id="year-2025-users">0</p>
+            </div>
+            <div class="user-card q1">
+                <h4>Q1 2025</h4>
+                <p id="q1-2025-users">0</p>
+            </div>
+            <div class="user-card q2">
+                <h4>Q2 2025 (Apr-May)</h4>
+                <p id="q2-2025-users">0</p>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="yearly-users-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="quarterly-users-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="plan-type-users-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="cumulative-users-chart"></canvas>
+            </div>
+        </div>
+    `,
+    "monthly-paid-users": `
+        <div class="page-banner">
+            <h3>Monthly Paid Users (Jan 2025 - Apr 2025)</h3>
+        </div>
+        <div class="user-cards">
+            <div class="user-card jan">
+                <h4>January 2025</h4>
+                <p id="jan-2025-users">0</p>
+            </div>
+            <div class="user-card feb">
+                <h4>February 2025</h4>
+                <p id="feb-2025-users">0</p>
+            </div>
+            <div class="user-card mar">
+                <h4>March 2025</h4>
+                <p id="mar-2025-users">0</p>
+            </div>
+            <div class="user-card apr">
+                <h4>April 2025</h4>
+                <p id="apr-2025-users">0</p>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="monthly-users-trend-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-plan-users-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-users-growth-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-users-distribution-chart"></canvas>
+            </div>
+        </div>
+    `,
+    "weekly-paid-users": `
+        <div class="page-banner">
+            <h3>Weekly Paid Users (April 2025)</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Weekly Users</h4>
+                <p id="weekly-users-amount">0</p>
+            </div>
+        </div>
+        <div class="user-cards">
+            <div class="user-card week-apr">
+                <h4>Apr Week 1</h4>
+                <p id="week1-apr-users">0</p>
+            </div>
+            <div class="user-card week-apr">
+                <h4>Apr Week 2</h4>
+                <p id="week2-apr-users">0</p>
+            </div>
+            <div class="user-card week-apr">
+                <h4>Apr Week 3</h4>
+                <p id="week3-apr-users">0</p>
+            </div>
+            <div class="user-card week-apr">
+                <h4>Apr Week 4</h4>
+                <p id="week4-apr-users">0</p>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="weekly-users-trend-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="weekly-plan-users-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="weekly-users-growth-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="weekly-users-distribution-chart"></canvas>
+            </div>
+        </div>
+    `,
+    "daily-paid-users": `
+        <div class="page-banner">
+            <h3>Daily Paid Users (May 19-22, 2025)</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Daily Users</h4>
+                <p id="daily-users-amount">0</p>
+            </div>
+        </div>
+        <div class="user-cards">
+            <div class="user-card day-19">
+                <h4>May 19</h4>
+                <p id="day-19-users">0</p>
+            </div>
+            <div class="user-card day-20">
+                <h4>May 20</h4>
+                <p id="day-20-users">0</p>
+            </div>
+            <div class="user-card day-21">
+                <h4>May 21</h4>
+                <p id="day-21-users">0</p>
+            </div>
+            <div class="user-card day-22">
+                <h4>May 22</h4>
+                <p id="day-22-users">0</p>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="daily-users-trend-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="daily-plan-users-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="daily-users-growth-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="daily-users-distribution-chart"></canvas>
+            </div>
+        </div>
+    `,
+    "monthly-demo-users": `
+        <div class="page-banner">
+            <h3>Monthly Demo Users (Jan 2025 - Apr 2025)</h3>
+        </div>
+        <div class="user-cards">
+            <div class="user-card jan">
+                <h4>January 2025</h4>
+                <p id="jan-2025-demo-users">0</p>
+            </div>
+            <div class="user-card feb">
+                <h4>February 2025</h4>
+                <p id="feb-2025-demo-users">0</p>
+            </div>
+            <div class="user-card mar">
+                <h4>March 2025</h4>
+                <p id="mar-2025-demo-users">0</p>
+            </div>
+            <div class="user-card apr">
+                <h4>April 2025</h4>
+                <p id="apr-2025-demo-users">0</p>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="monthly-demo-users-trend-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-demo-users-growth-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-demo-users-distribution-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-demo-users-conversion-chart"></canvas>
+            </div>
+        </div>
+    `,
+    "daily-demo-users": `
+        <div class="page-banner">
+            <h3>Daily Demo Users (May 19-22, 2025)</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Daily Demo Users</h4>
+                <p id="daily-demo-users-amount">0</p>
+            </div>
+        </div>
+        <div class="user-cards">
+            <div class="user-card day-19">
+                <h4>May 19</h4>
+                <p id="day-19-demo-users">0</p>
+            </div>
+            <div class="user-card day-20">
+                <h4>May 20</h4>
+                <p id="day-20-demo-users">0</p>
+            </div>
+            <div class="user-card day-21">
+                <h4>May 21</h4>
+                <p id="day-21-demo-users">0</p>
+            </div>
+            <div class="user-card day-22">
+                <h4>May 22</h4>
+                <p id="day-22-demo-users">0</p>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-container">
+                <canvas id="daily-demo-users-trend-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="daily-demo-users-growth-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="daily-demo-users-distribution-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="daily-demo-users-conversion-chart"></canvas>
+            </div>
+        </div>
+    `,
+    "total-paid-subscribers": `
+        <div class="page-banner">
+            <h3>Total Paid Subscriber List</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Subscribers</h4>
+                <p id="total-count">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Daily Subscribers</h4>
+                <p id="daily-count">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Monthly Subscribers</h4>
+                <p id="monthly-count">0</p>
+            </div>
+        </div>
+        <div class="controls">
+            <input type="text" class="search-bar" placeholder="Search subscribers..." data-table="total-paid">
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Date</th>
+                        <th>Referral ID</th>
+                        <th>Trading View ID</th>
+                        <th>Phone Number</th>
+                        <th>Email ID</th>
+                        <th>Plan</th>
+                        <th>Pricing</th>
+                        <th>Paid Confirm</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="total-paid-table-body"></tbody>
+            </table>
+        </div>
+    `,
+    "monthly-paid-subscribers": `
+        <div class="page-banner">
+            <h3>Monthly Paid Subscriber List</h3>
+        </div>
+        <div class="controls">
+            <input type="text" class="search-bar" placeholder="Search subscribers..." data-table="monthly-paid">
+
+            
+            <button class="add-btn" data-table="monthly-paid">Add New Member</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Date</th>
+                        <th>Referral ID</th>
+                        <th>Trading View ID</th>
+                        <th>Phone Number</th>
+                        <th>Email ID</th>
+                        <th>Plan</th>
+                        <th>Pricing</th>
+                        <th>Paid Confirm</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="monthly-paid-table-body"></tbody>
+            </table>
+        </div>
+    `,
+    "daily-paid-subscribers": `
+        <div class="page-banner">
+            <h3>Daily Paid Subscriber List</h3>
+        </div>
+        <div class="controls">
+            <input type="text" class="search-bar" placeholder="Search subscribers..." data-table="daily-paid">
+            <button class="add-btn" data-table="daily-paid">Add New Member</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Date</th>
+                        <th>Referral ID</th>
+                        <th>Trading View ID</th>
+                        <th>Phone Number</th>
+                        <th>Email ID</th>
+                        <th>Plan</th>
+                        <th>Pricing</th>
+                        <th>Paid Confirm</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="daily-paid-table-body"></tbody>
+            </table>
+        </div>
+    `,
+    "daily-demo-subscribers": `
+        <div class="page-banner">
+            <h3>Daily Demo Subscribers List</h3>
+        </div>
+        <div class="controls">
+            <input type="text" class="search-bar" placeholder="Search subscribers..." data-table="daily-demo">
+            <button class="add-btn" data-table="daily-demo">Add New Member</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Date</th>
+                        <th>Referral ID</th>
+                        <th>Trading View ID</th>
+                        <th>Phone Number</th>
+                        <th>Email ID</th>
+                        <th>Plan</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="daily-demo-table-body"></tbody>
+            </table>
+        </div>
+    `,
+    "total-demo-subscribers": `
+        <div class="page-banner">
+            <h3>Total Demo Subscribers List</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Demo Subscribers</h4>
+                <p id="total-demo-count">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Daily Demo Subscribers</h4>
+                <p id="daily-demo-count">0</p>
+            </div>
+        </div>
+        <div class="controls">
+            <input type="text" class="search-bar" placeholder="Search subscribers..." data-table="total-demo">
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Date</th>
+                        <th>Referral ID</th>
+                        <th>Trading View ID</th>
+                        <th>Phone Number</th>
+                        <th>Email ID</th>
+                        <th>Plan</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="total-demo-table-body"></tbody>
+            </table>
+        </div>
+    `,
+    "main-users": `
+        <div class="page-banner">
+            <h3>Main User List</h3>
+        </div>
+        <div class="summary">
+            <div class="summary-card">
+                <h4>Total Users</h4>
+                <p id="total-users-count">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Paid Subscribers</h4>
+                <p id="main-total-paid-count">0</p>
+            </div>
+            <div class="summary-card">
+                <h4>Total Demo Subscribers</h4>
+                <p id="main-total-demo-count">0</p>
+            </div>
+        </div>
+        <div class="controls">
+            <input type="text" class="search-bar" placeholder="Search users..." data-table="main-users">
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Username</th>
+                        <th>Date</th>
+                        <th>Referral ID</th>
+                        <th>Trading View ID</th>
+                        <th>Phone Number</th>
+                        <th>Email ID</th>
+                        <th>Plan</th>
+                        <th>Pricing</th>
+                        <th>Paid Confirm</th>
+                        <th>Expiry Date</th>
+                        <th>Remaining Days</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="main-users-table-body"></tbody>
+            </table>
+        </div>
+    `,
+    "logout": `
+        <div class="page-banner">
+            <h3>Logout</h3>
+        </div>
+        <div>
+            <p>You have been logged out.</p>
+        </div>
+    `,
+
+
+
+
+
+
+
+
+     "total-profit": `
+                <div class="page-banner">
+                    <h3>Total Profit (2023-2025)</h3>
+                </div>
+                <div class="summary">
+                    <div class="summary-card">
+                        <h4>Total Profit (₹)</h4>
+                        <p id="total-profit-amount">40,000</p>
+                    </div>
+                </div>
+                <div class="profit-cards">
+                    <div class="profit-card year-2023">
+                        <h4>2023 Profit</h4>
+                        <p id="year-2023-profit">₹48,000</p>
+                    </div>
+                    <div class="profit-card year-2024">
+                        <h4>2024 Profit</h4>
+                        <p id="year-2024-profit">₹34,000</p>
+                    </div>
+                    <div class="profit-card year-2025">
+                        <h4>2025 Profit</h4>
+                        <p id="year-2025-profit">₹32,000</p>
+                    </div>
+                    <div class="profit-card q1">
+                        <h4>Q1 2025</h4>
+                        <p id="q1-2025-profit">₹20,000</p>
+                    </div>
+                    <div class="profit-card q2">
+                        <h4>Q2 2025 (Apr-May)</h4>
+                        <p id="q2-2025-profit">₹25,000</p>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <canvas id="yearly-profit-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="quarterly-profit-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="plan-type-profit-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="cumulative-profit-chart"></canvas>
+                    </div>
+                </div>
+            `,
+            "monthly-profit": `
+                <div class="page-banner">
+                    <h3>Monthly Profit (Jan 2025 - Apr 2025)</h3>
+                </div>
+                <div class="profit-cards">
+                    <div class="profit-card jan">
+                        <h4>January 2025</h4>
+                        <p id="jan-2025-profit">₹0</p>
+                    </div>
+                    <div class="profit-card feb">
+                        <h4>February 2025</h4>
+                        <p id="feb-2025-profit">₹0</p>
+                    </div>
+                    <div class="profit-card mar">
+                        <h4>March 2025</h4>
+                        <p id="mar-2025-profit">₹0</p>
+                    </div>
+                    <div class="profit-card apr">
+                        <h4>April 2025</h4>
+                        <p id="apr-2025-profit">₹0</p>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <canvas id="monthly-profit-trend-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthly-plan-profit-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthly-subscriber-count-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="monthly-profit-growth-chart"></canvas>
+                    </div>
+                </div>
+            `,
+            "weekly-profit": `
+                <div class="page-banner">
+                    <h3>Weekly Profit (April 2025)</h3>
+                </div>
+                <div class="summary">
+                    <div class="summary-card">
+                        <h4>Total Weekly Profit (₹)</h4>
+                        <p id="weekly-profit-amount">0</p>
+                    </div>
+                </div>
+                <div class="profit-cards">
+                    <div class="profit-card week-apr">
+                        <h4>Apr Week 1</h4>
+                        <p id="week1-apr-profit">₹0</p>
+                    </div>
+                    <div class="profit-card week-apr">
+                        <h4>Apr Week 2</h4>
+                        <p id="week2-apr-profit">₹0</p>
+                    </div>
+                    <div class="profit-card week-apr">
+                        <h4>Apr Week 3</h4>
+                        <p id="week3-apr-profit">₹0</p>
+                    </div>
+                    <div class="profit-card week-apr">
+                        <h4>Apr Week 4</h4>
+                        <p id="week4-apr-profit">₹0</p>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <canvas id="weekly-profit-trend-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weekly-plan-profit-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weekly-subscriber-count-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weekly-profit-distribution-chart"></canvas>
+                    </div>
+                </div>
+            `,
+            "daily-profit": `
+                <div class="page-banner">
+                    <h3>Daily Profit (May 19-22, 2025)</h3>
+                </div>
+                <div class="summary">
+                    <div class="summary-card">
+                        <h4>Total Daily Profit (₹)</h4>
+                        <p id="daily-profit-amount">0</p>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <canvas id="daily-profit-trend-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="daily-plan-profit-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="daily-subscriber-count-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="daily-profit-share-chart"></canvas>
+                    </div>
+                </div>
+            `
+};
+
+function renderTable(data, tableBodyId, tableType) {
+    const tableBody = document.getElementById(tableBodyId);
+    if (!tableBody) {
+        console.error(`Table body with ID ${tableBodyId} not found.`);
+        return;
+    }
+    tableBody.innerHTML = "";
+    
+    let combinedData = data;
+    if (tableType === "main-users") {
+        combinedData = [
+            ...totalPaidSubscribers.map(item => ({ ...item, source: "paid" })),
+            ...totalDemoSubscribers.map(item => ({ ...item, source: "demo" }))
+        ];
+        combinedData = combinedData.map((item, index) => ({
+            ...item,
+            displaySlNo: index + 1
+        }));
+    }
+
+    combinedData.forEach((item, index) => {
+        const row = document.createElement("tr");
+        const displaySlNo = tableType === "main-users" ? item.displaySlNo : (tableType === "total-paid" || tableType === "total-demo" ? item.slNo : item.slNo);
+        const isDemo = item.plan.includes("Demo") || (tableType === "daily-demo" || tableType === "total-demo");
+        row.innerHTML = `
+            <td>${displaySlNo}</td>
+            <td>${item.username}</td>
+            <td>${item.date}</td>
+            <td>${item.referralId}</td>
+            <td>${item.tradingId}</td>
+            <td>${item.phone}</td>
+            <td>${item.email}</td>
+            <td>${item.plan}</td>
+            ${isDemo ? `
+                <td>-</td>
+                <td>-</td>
+            ` : `
+                <td>${item.pricing}</td>
+                <td>${item.paidConfirm}</td>
+            `}
+            <td>${item.expiryDate}</td>
+            <td>${item.remainingDays}</td>
+            <td>
+                <button class="action-icon delete-icon" data-id="${item.slNo}" data-table="${tableType}" data-plan="${item.plan}" data-source="${tableType === "main-users" ? item.source : ''}">🗑️</button>
+                <button class="action-icon view-icon" data-id="${item.slNo}" data-table="${tableType}" data-plan="${item.plan}" data-source="${tableType === "main-users" ? item.source : ''}">👁️</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function filterMonthlyData(data) {
+    return data.filter(item => {
+        const date = new Date(item.date);
+        return date.getFullYear() === 2025 && date.getMonth() === 4 && item.plan === "Monthly";
+    });
+}
+
+function filterDailyPaidData(data) {
+    return data.filter(item => item.date === "2025-05-21" && item.plan === "Daily");
+}
+
+function filterDailyDemoData(data) {
+    return data.filter(item => item.date === "2025-05-21" && item.plan === "Daily Demo");
+}
+
+function updatePaidSummaryCounts() {
+    const totalCount = totalPaidSubscribers.length;
+    const dailyCount = filterDailyPaidData(dailyPaidSubscribers).length;
+    const monthlyCount = filterMonthlyData(monthlyPaidSubscribers).length;
+
+    const totalCountElement = document.getElementById("total-count");
+    const dailyCountElement = document.getElementById("daily-count");
+    const monthlyCountElement = document.getElementById("monthly-count");
+
+    if (totalCountElement) totalCountElement.textContent = totalCount;
+    if (dailyCountElement) dailyCountElement.textContent = dailyCount;
+    if (monthlyCountElement) monthlyCountElement.textContent = monthlyCount;
+}
+
+function updateDemoSummaryCounts() {
+    const totalDemoCount = totalDemoSubscribers.length;
+    const dailyDemoCount = filterDailyDemoData(dailyDemoSubscribers).length;
+
+    const totalDemoCountElement = document.getElementById("total-demo-count");
+    const dailyDemoCountElement = document.getElementById("daily-demo-count");
+
+    if (totalDemoCountElement) totalDemoCountElement.textContent = totalDemoCount;
+    if (dailyDemoCountElement) dailyDemoCountElement.textContent = dailyDemoCount;
+}
+
+function updateMainUserSummaryCounts() {
+    const totalPaidCount = totalPaidSubscribers.length;
+    const totalDemoCount = totalDemoSubscribers.length;
+    const totalUsersCount = totalPaidCount + totalDemoCount;
+
+    const totalUsersCountElement = document.getElementById("total-users-count");
+    const mainTotalPaidCountElement = document.getElementById("main-total-paid-count");
+    const mainTotalDemoCountElement = document.getElementById("main-total-demo-count");
+
+    if (totalUsersCountElement) totalUsersCountElement.textContent = totalUsersCount;
+    if (mainTotalPaidCountElement) mainTotalPaidCountElement.textContent = totalPaidCount;
+    if (mainTotalDemoCountElement) mainTotalDemoCountElement.textContent = totalDemoCount;
+}
+
+initializeData();
+
+const mainContent = document.getElementById("main-content");
+const hamburger = document.querySelector(".hamburger");
+const sidebar = document.querySelector(".sidebar");
+const sidebarLinks = document.querySelectorAll(".sidebar a");
+const headerLinks = document.querySelectorAll(".header-links a");
+
+if (mainContent) {
+    mainContent.innerHTML = pages["total-users"];
+    updateUserSections("total-users");
+} else {
+    console.error("Main content element not found.");
+}
+
+if (hamburger && sidebar && mainContent) {
+    hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+        mainContent.classList.toggle("shifted");
+    });
+} else {
+    console.error("Hamburger, sidebar, or main-content not found.");
+}
+
+function syncActiveLinks(pageId) {
+    sidebarLinks.forEach(l => l.classList.remove("active"));
+    headerLinks.forEach(l => l.classList.remove("active"));
+
+    const sidebarLink = Array.from(sidebarLinks).find(link => link.getAttribute("data-page") === pageId);
+    const headerLink = Array.from(headerLinks).find(link => link.getAttribute("data-page") === pageId);
+
+    if (sidebarLink) sidebarLink.classList.add("active");
+    if (headerLink) headerLink.classList.add("active");
+}
+
+function loadPage(pageId) {
+    mainContent.innerHTML = pages[pageId] || `<div><h3>Page Not Found</h3></div>`;
+    syncActiveLinks(pageId);
+
+    dailyPaidSubscribers = JSON.parse(localStorage.getItem("dailyPaidSubscribers")) || [];
+    monthlyPaidSubscribers = JSON.parse(localStorage.getItem("monthlyPaidSubscribers")) || [];
+    totalPaidSubscribers = JSON.parse(localStorage.getItem("totalPaidSubscribers")) || [];
+    dailyDemoSubscribers = JSON.parse(localStorage.getItem("dailyDemoSubscribers")) || [];
+    totalDemoSubscribers = JSON.parse(localStorage.getItem("totalDemoSubscribers")) || [];
+
+    if (pageId === "total-paid-subscribers") {
+        renderTable(totalPaidSubscribers, "total-paid-table-body", "total-paid");
+        updatePaidSummaryCounts();
+    } else if (pageId === "monthly-paid-subscribers") {
+        const monthlyData = filterMonthlyData(monthlyPaidSubscribers);
+        renderTable(monthlyData, "monthly-paid-table-body", "monthly-paid");
+    } else if (pageId === "daily-paid-subscribers") {
+        const dailyData = filterDailyPaidData(dailyPaidSubscribers);
+        renderTable(dailyData, "daily-paid-table-body", "daily-paid");
+    } else if (pageId === "daily-demo-subscribers") {
+        const dailyDemoData = filterDailyDemoData(dailyDemoSubscribers);
+        renderTable(dailyDemoData, "daily-demo-table-body", "daily-demo");
+    } else if (pageId === "total-demo-subscribers") {
+        renderTable(totalDemoSubscribers, "total-demo-table-body", "total-demo");
+        updateDemoSummaryCounts();
+    } else if (pageId === "main-users") {
+        renderTable([], "main-users-table-body", "main-users");
+        updateMainUserSummaryCounts();
+    } else if (pageId === "total-users" || pageId === "monthly-paid-users" || pageId === "weekly-paid-users" || pageId === "daily-paid-users" || pageId === "monthly-demo-users" || pageId === "daily-demo-users") {
+        updateUserSections(pageId);
+    } else if (pageId === "total-profit" || pageId === "monthly-profit" || pageId === "weekly-profit" || pageId === "daily-profit") {
+                    updateProfitSections(pageId);
+                } else if (pageId === "total-paid-subscribers") {
+                    renderSubscriberList("main-content", totalPaidSubscribers, "Paid Subscribers");
+                } else if (pageId === "monthly-paid-subscribers") {
+                    renderSubscriberList("main-content", monthlyPaidSubscribers, "Monthly Paid Subscribers");
+                } else if (pageId === "daily-paid-subscribers") {
+                    renderSubscriberList("main-content", dailyPaidSubscribers, "Daily Paid Subscribers");
+                } else if (pageId === "total-demo-subscribers") {
+                    renderSubscriberList("main-content", totalDemoSubscribers, "Demo Subscribers");
+                } else if (pageId === "daily-demo-subscribers") {
+                    renderSubscriberList("main-content", dailyDemoSubscribers, "Daily Demo Subscribers");
+                }  
+
+    attachEventListeners();
+}
+
+if (sidebarLinks) {
+    sidebarLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute("data-page");
+            loadPage(pageId);
+        });
+    });
+} else {
+    console.error("Sidebar links not found.");
+}
+
+if (headerLinks) {
+    headerLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute("data-page");
+            loadPage(pageId);
+        });
+    });
+} else {
+    console.error("Header links not found.");
+}
+
+function attachEventListeners() {
+    const form = document.getElementById("add-member-form");
+    if (!form) {
+        console.error("Add member form not found.");
+        return;
+    }
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    const addButtons = document.querySelectorAll(".add-btn");
+    if (addButtons) {
+        addButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const table = btn.getAttribute("data-table");
+                const addModal = document.getElementById("add-modal");
+                const newForm = document.getElementById("add-member-form");
+
+                const paidFields = document.querySelectorAll(".paid-field");
+                const isDemo = table === "daily-demo";
+                paidFields.forEach(field => {
+                    field.style.display = isDemo ? "none" : "block";
+                });
+
+                if (table === "daily-paid") {
+                    document.getElementById("slNo").value = dailyPaidSubscribers.length + 1;
+                    document.getElementById("plan").value = "Daily";
+                    document.getElementById("pricing").value = "$10";
+                    document.getElementById("date").value = "2025-05-21";
+                    document.getElementById("expiryDate").value = "2025-05-22";
+                    document.getElementById("remainingDays").value = 1;
+                    document.getElementById("paidConfirm").value = "Yes";
+                } else if (table === "monthly-paid") {
+                    document.getElementById("slNo").value = monthlyPaidSubscribers.length + 1;
+                    document.getElementById("plan").value = "Monthly";
+                    document.getElementById("pricing").value = "$30";
+                    document.getElementById("date").value = "2025-05-21";
+                    document.getElementById("expiryDate").value = "2025-05-31";
+                    document.getElementById("remainingDays").value = 10;
+                    document.getElementById("paidConfirm").value = "Yes";
+                } else if (table === "daily-demo") {
+                    document.getElementById("slNo").value = dailyDemoSubscribers.length + 1;
+                    document.getElementById("plan").value = "Daily Demo";
+                    document.getElementById("date").value = "2025-05-21";
+                    document.getElementById("expiryDate").value = "2025-05-22";
+                    document.getElementById("remainingDays").value = 1;
+                }
+
+                const planInput = document.getElementById("plan");
+                const pricingInput = document.getElementById("pricing");
+                const dateInput = document.getElementById("date");
+                const expiryDateInput = document.getElementById("expiryDate");
+                const remainingDaysInput = document.getElementById("remainingDays");
+
+                if (planInput) planInput.disabled = false;
+                if (pricingInput) pricingInput.readOnly = false;
+                if (dateInput) dateInput.readOnly = false;
+                if (expiryDateInput) expiryDateInput.readOnly = false;
+                if (remainingDaysInput) remainingDaysInput.readOnly = false;
+
+                newForm.setAttribute("data-table", table);
+                if (addModal) addModal.style.display = "flex";
+            });
+        });
+    }
+
+    const addMemberForm = document.getElementById("add-member-form");
+    if (addMemberForm) {
+        addMemberForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const table = form.getAttribute("data-table");
+
+            const newMember = {
+                slNo: table === "daily-paid" ? dailyPaidSubscribers.length + 1 :
+                      table === "monthly-paid" ? monthlyPaidSubscribers.length + 1 :
+                      dailyDemoSubscribers.length + 1,
+                username: form.username.value,
+                date: form.date.value,
+                referralId: form.referralId.value,
+                tradingId: form.tradingId.value,
+                phone: form.phone.value,
+                email: form.email.value,
+                plan: form.plan.value,
+                pricing: table === "daily-demo" ? "Free" : form.pricing.value,
+                paidConfirm: table === "daily-demo" ? "Yes" : form.paidConfirm.value,
+                expiryDate: form.expiryDate.value,
+                remainingDays: parseInt(form.remainingDays.value)
+            };
+
+            if (table === "daily-paid") {
+                dailyPaidSubscribers.push(newMember);
+                localStorage.setItem("dailyPaidSubscribers", JSON.stringify(dailyPaidSubscribers));
+                newMember.slNo = totalPaidSubscribers.length + 1;
+                totalPaidSubscribers.push(newMember);
+                localStorage.setItem("totalPaidSubscribers", JSON.stringify(totalPaidSubscribers));
+            } else if (table === "monthly-paid") {
+                monthlyPaidSubscribers.push(newMember);
+                localStorage.setItem("monthlyPaidSubscribers", JSON.stringify(monthlyPaidSubscribers));
+                newMember.slNo = totalPaidSubscribers.length + 1;
+                totalPaidSubscribers.push(newMember);
+                localStorage.setItem("totalPaidSubscribers", JSON.stringify(totalPaidSubscribers));
+            } else if (table === "daily-demo") {
+                dailyDemoSubscribers.push(newMember);
+                localStorage.setItem("dailyDemoSubscribers", JSON.stringify(dailyDemoSubscribers));
+                newMember.slNo = totalDemoSubscribers.length + 1;
+                totalDemoSubscribers.push(newMember);
+                localStorage.setItem("totalDemoSubscribers", JSON.stringify(totalDemoSubscribers));
+            }
+
+            const addModal = document.getElementById("add-modal");
+            if (addModal) addModal.style.display = "none";
+
+            if (table === "monthly-paid") {
+                const monthlyData = filterMonthlyData(monthlyPaidSubscribers);
+                renderTable(monthlyData, "monthly-paid-table-body", "monthly-paid");
+            } else if (table === "daily-paid") {
+                const dailyData = filterDailyPaidData(dailyPaidSubscribers);
+                renderTable(dailyData, "daily-paid-table-body", "daily-paid");
+            } else if (table === "daily-demo") {
+                const dailyDemoData = filterDailyDemoData(dailyDemoSubscribers);
+                renderTable(dailyDemoData, "daily-demo-table-body", "daily-demo");
+            }
+
+            if (document.getElementById("total-paid-table-body")) {
+                renderTable(totalPaidSubscribers, "total-paid-table-body", "total-paid");
+                updatePaidSummaryCounts();
+            }
+            if (document.getElementById("total-demo-table-body")) {
+                renderTable(totalDemoSubscribers, "total-demo-table-body", "total-demo");
+                updateDemoSummaryCounts();
+            }
+            if (document.getElementById("main-users-table-body")) {
+                renderTable([], "main-users-table-body", "main-users");
+                updateMainUserSummaryCounts();
+            }
+
+            attachEventListeners();
+        });
+    }
+
+    const searchBars = document.querySelectorAll(".search-bar");
+    if (searchBars) {
+        searchBars.forEach(searchBar => {
+            searchBar.addEventListener("input", (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const tableType = e.target.getAttribute("data-table");
+                let dataToFilter, tableBodyId;
+
+                if (tableType === "total-paid") {
+                    dataToFilter = totalPaidSubscribers;
+                    tableBodyId = "total-paid-table-body";
+                } else if (tableType === "monthly-paid") {
+                    dataToFilter = filterMonthlyData(monthlyPaidSubscribers);
+                    tableBodyId = "monthly-paid-table-body";
+                } else if (tableType === "daily-paid") {
+                    dataToFilter = filterDailyPaidData(dailyPaidSubscribers);
+                    tableBodyId = "daily-paid-table-body";
+                } else if (tableType === "daily-demo") {
+                    dataToFilter = filterDailyDemoData(dailyDemoSubscribers);
+                    tableBodyId = "daily-demo-table-body";
+                } else if (tableType === "total-demo") {
+                    dataToFilter = totalDemoSubscribers;
+                    tableBodyId = "total-demo-table-body";
+                } else if (tableType === "main-users") {
+                    dataToFilter = [
+                        ...totalPaidSubscribers.map(item => ({ ...item, source: "paid" })),
+                        ...totalDemoSubscribers.map(item => ({ ...item, source: "demo" }))
+                    ].map((item, index) => ({
+                        ...item,
+                        displaySlNo: index + 1
+                    }));
+                    tableBodyId = "main-users-table-body";
+                }
+
+                const filteredData = dataToFilter.filter(item =>
+                    Object.values(item).some(value =>
+                        value.toString().toLowerCase().includes(searchTerm)
+                    )
+                );
+                renderTable(filteredData, tableBodyId, tableType);
+            });
+        });
+    }
+
+    const deleteIcons = document.querySelectorAll(".delete-icon");
+    if (deleteIcons) {
+        deleteIcons.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const id = parseInt(e.target.getAttribute("data-id"));
+                const table = e.target.getAttribute("data-table");
+                const plan = e.target.getAttribute("data-plan");
+                const source = e.target.getAttribute("data-source");
+
+                if (plan === "Daily") {
+                    dailyPaidSubscribers = dailyPaidSubscribers.filter(item => item.slNo !== id);
+                    dailyPaidSubscribers = dailyPaidSubscribers.map((item, index) => ({
+                        ...item,
+                        slNo: index + 1
+                    }));
+                    localStorage.setItem("dailyPaidSubscribers", JSON.stringify(dailyPaidSubscribers));
+                } else if (plan === "Monthly") {
+                    monthlyPaidSubscribers = monthlyPaidSubscribers.filter(item => item.slNo !== id);
+                    monthlyPaidSubscribers = monthlyPaidSubscribers.map((item, index) => ({
+                        ...item,
+                        slNo: index + 1
+                    }));
+                    localStorage.setItem("monthlyPaidSubscribers", JSON.stringify(monthlyPaidSubscribers));
+                } else if (plan === "Daily Demo") {
+                    dailyDemoSubscribers = dailyDemoSubscribers.filter(item => item.slNo !== id);
+                    dailyDemoSubscribers = dailyDemoSubscribers.map((item, index) => ({
+                        ...item,
+                        slNo: index + 1
+                    }));
+                    localStorage.setItem("dailyDemoSubscribers", JSON.stringify(dailyDemoSubscribers));
+                }
+
+                if (plan === "Daily" || plan === "Monthly" || source === "paid") {
+                    totalPaidSubscribers = totalPaidSubscribers.filter(item => !(item.slNo === id && item.plan === plan));
+                    totalPaidSubscribers = totalPaidSubscribers.map((item, index) => ({
+                        ...item,
+                        slNo: index + 1
+                    }));
+                    localStorage.setItem("totalPaidSubscribers", JSON.stringify(totalPaidSubscribers));
+                } 
+                if (plan === "Daily Demo" || source === "demo") {
+                    totalDemoSubscribers = totalDemoSubscribers.filter(item => !(item.slNo === id && item.plan === plan));
+                    totalDemoSubscribers = totalDemoSubscribers.map((item, index) => ({
+                        ...item,
+                        slNo: index + 1
+                    }));
+                    localStorage.setItem("totalDemoSubscribers", JSON.stringify(totalDemoSubscribers));
+                }
+
+                if (table === "total-paid") {
+                    renderTable(totalPaidSubscribers, "total-paid-table-body", "total-paid");
+                    updatePaidSummaryCounts();
+                } else if (table === "monthly-paid") {
+                    const monthlyData = filterMonthlyData(monthlyPaidSubscribers);
+                    renderTable(monthlyData, "monthly-paid-table-body", "monthly-paid");
+                } else if (table === "daily-paid") {
+                    const dailyData = filterDailyPaidData(dailyPaidSubscribers);
+                    renderTable(dailyData, "daily-paid-table-body", "daily-paid");
+                } else if (table === "daily-demo") {
+                    const dailyDemoData = filterDailyDemoData(dailyDemoSubscribers);
+                    renderTable(dailyDemoData, "daily-demo-table-body", "daily-demo");
+                } else if (table === "total-demo") {
+                    renderTable(totalDemoSubscribers, "total-demo-table-body", "total-demo");
+                    updateDemoSummaryCounts();
+                } else if (table === "main-users") {
+                    renderTable([], "main-users-table-body", "main-users");
+                    updateMainUserSummaryCounts();
+                }
+
+                updatePaidSummaryCounts();
+                updateDemoSummaryCounts();
+                updateMainUserSummaryCounts();
+
+                attachEventListeners();
+            });
+        });
+    }
+
+    const viewIcons = document.querySelectorAll(".view-icon");
+    if (viewIcons) {
+        viewIcons.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const id = parseInt(e.target.getAttribute("data-id"));
+                const plan = e.target.getAttribute("data-plan");
+                const source = e.target.getAttribute("data-source");
+                let subscriber;
+
+                if (source === "paid" || plan === "Daily" || plan === "Monthly") {
+                    subscriber = totalPaidSubscribers.find(item => item.slNo === id && item.plan === plan);
+                } else if (source === "demo" || plan === "Daily Demo") {
+                    subscriber = totalDemoSubscribers.find(item => item.slNo === id && item.plan === plan);
+                } else if (plan.includes("Demo")) {
+                    subscriber = totalDemoSubscribers.find(item => item.slNo === id);
+                } else {
+                    subscriber = totalPaidSubscribers.find(item => item.slNo === id);
+                }
+
+                if (subscriber) {
+                    const modal = document.getElementById("view-modal");
+                    const modalDetails = document.getElementById("view-details");
+                    const isDemo = subscriber.plan.includes("Demo");
+                    modalDetails.innerHTML = `
+                        <p><strong>S.No:</strong> ${subscriber.slNo}</p>
+                        <p><strong>Username:</strong> ${subscriber.username}</p>
+                        <p><strong>Date:</strong> ${subscriber.date}</p>
+                        <p><strong>Referral ID:</strong> ${subscriber.referralId}</p>
+                        <p><strong>Trading View ID:</strong> ${subscriber.tradingId}</p>
+                        <p><strong>Phone Number:</strong> ${subscriber.phone}</p>
+                        <p><strong>Email ID:</strong> ${subscriber.email}</p>
+                        <p><strong>Plan:</strong> ${subscriber.plan}</p>
+                        ${isDemo ? "" : `
+                            <p><strong>Pricing:</strong> ${subscriber.pricing}</p>
+                            <p><strong>Paid Confirm:</strong> ${subscriber.paidConfirm}</p>
+                        `}
+                        <p><strong>Expiry Date:</strong> ${subscriber.expiryDate}</p>
+                        <p><strong>Remaining Days:</strong> ${subscriber.remainingDays}</p>
+                    `;
+                    if (modal) modal.style.display = "flex";
+                }
+            });
+        });
+    }
+}
+
+const closeViewModal = document.getElementById("close-view-modal");
+const viewModal = document.getElementById("view-modal");
+if (closeViewModal && viewModal) {
+    closeViewModal.addEventListener("click", () => {
+        viewModal.style.display = "none";
+    });
+    viewModal.addEventListener("click", (e) => {
+        if (e.target === viewModal) {
+            viewModal.style.display = "none";
+        }
+    });
+} else {
+    console.error("View modal elements not found.");
+}
+
+const closeAddModal = document.getElementById("close-add-modal");
+const addModal = document.getElementById("add-modal");
+if (closeAddModal && addModal) {
+    closeAddModal.addEventListener("click", () => {
+        addModal.style.display = "none";
+    });
+    addModal.addEventListener("click", (e) => {
+        if (e.target === addModal) {
+            addModal.style.display = "none";
+        }
+    });
+} else {
+    console.error("Add modal elements not found.");
+}
+
+console.log("Dashboard2.js is running!");
+
+// User count calculation and chart rendering
+function generateUserData() {
+    const userData = {
+        total: {
+            yearly: { 2023: { paid: 10, demo: 11 }, 2024: { paid: 12, demo: 14 }, 2025: { paid: 10, demo: 9 } },
+            quarterly2025: { q1: { paid: 10, demo: 10 }, q2: { paid: 10, demo: 10 } },
+            planBreakdown: { Daily: 18, Monthly: 12, DailyDemo: 18 }
+        },
+        monthlyPaid2025: { jan: 12, feb: 10, mar: 18, apr: 20},
+        weeklyPaidApril2025: { week1: 20, week2: 12, week3: 19, week4: 18},
+        dailyPaidMay2025: { "19": 10, "20": 10, "21": 12, "22": 12 },
+        monthlyDemo2025: { jan: 12, feb: 10, mar: 10, apr: 12 },
+        dailyDemoMay2025: { "19": 12, "20": 10, "21": 10, "22": 12 }
+    };
+
+    // Total Users (Paid + Demo)
+    userData.total.yearly[2023].paid = Math.round(Math.random() * 100) + 50;
+    userData.total.yearly[2023].demo = Math.round(Math.random() * 80) + 40;
+    userData.total.yearly[2024].paid = Math.round(Math.random() * 150) + 100;
+    userData.total.yearly[2024].demo = Math.round(Math.random() * 120) + 80;
+    userData.total.yearly[2025].paid = totalPaidSubscribers.length;
+    userData.total.yearly[2025].demo = totalDemoSubscribers.length;
+
+    userData.total.quarterly2025.q1.paid = Math.round(Math.random() * 40) + 20;
+    userData.total.quarterly2025.q1.demo = Math.round(Math.random() * 30) + 15;
+    userData.total.quarterly2025.q2.paid = totalPaidSubscribers.filter(sub => {
+        const date = new Date(sub.date);
+        return date.getFullYear() === 2025 && (date.getMonth() === 3 || date.getMonth() === 4);
+    }).length;
+    userData.total.quarterly2025.q2.demo = totalDemoSubscribers.filter(sub => {
+        const date = new Date(sub.date);
+        return date.getFullYear() === 2025 && (date.getMonth() === 3 || date.getMonth() === 4);
+    }).length;
+
+    userData.total.planBreakdown.Daily = totalPaidSubscribers.filter(sub => sub.plan === "Daily").length;
+    userData.total.planBreakdown.Monthly = totalPaidSubscribers.filter(sub => sub.plan === "Monthly").length;
+    userData.total.planBreakdown.DailyDemo = totalDemoSubscribers.filter(sub => sub.plan === "Daily Demo").length;
+
+    // Monthly Paid Users
+    userData.monthlyPaid2025.jan = Math.round(Math.random() * 10) + 5;
+    userData.monthlyPaid2025.feb = Math.round(Math.random() * 12) + 6;
+    userData.monthlyPaid2025.mar = Math.round(Math.random() * 15) + 8;
+    userData.monthlyPaid2025.apr = totalPaidSubscribers.filter(sub => {
+        const date = new Date(sub.date);
+        return date.getFullYear() === 2025 && date.getMonth() === 3;
+    }).length;
+
+    // Weekly Paid Users (April 2025)
+    userData.weeklyPaidApril2025.week1 = Math.round(Math.random() * 5) + 2;
+    userData.weeklyPaidApril2025.week2 = Math.round(Math.random() * 6) + 3;
+    userData.weeklyPaidApril2025.week3 = Math.round(Math.random() * 7) + 4;
+    userData.weeklyPaidApril2025.week4 = totalPaidSubscribers.filter(sub => {
+        const date = new Date(sub.date);
+        return date.getFullYear() === 2025 && date.getMonth() === 3 && date.getDate() >= 22;
+    }).length;
+
+    // Daily Paid Users (May 2025)
+    userData.dailyPaidMay2025["19"] = Math.round(Math.random() * 2) + 1;
+    userData.dailyPaidMay2025["20"] = Math.round(Math.random() * 3) + 1;
+    userData.dailyPaidMay2025["21"] = totalPaidSubscribers.filter(sub => sub.date === "2025-05-21").length;
+    userData.dailyPaidMay2025["22"] = Math.round(Math.random() * 4) + 2;
+
+    // Monthly Demo Users
+    userData.monthlyDemo2025.jan = Math.round(Math.random() * 8) + 4;
+    userData.monthlyDemo2025.feb = Math.round(Math.random() * 10) + 5;
+    userData.monthlyDemo2025.mar = Math.round(Math.random() * 12) + 6;
+    userData.monthlyDemo2025.apr = totalDemoSubscribers.filter(sub => {
+        const date = new Date(sub.date);
+        return date.getFullYear() === 2025 && date.getMonth() === 3;
+    }).length;
+
+    // Daily Demo Users (May 2025)
+    userData.dailyDemoMay2025["19"] = Math.round(Math.random() * 2) + 1;
+    userData.dailyDemoMay2025["20"] = Math.round(Math.random() * 2) + 1;
+    userData.dailyDemoMay2025["21"] = totalDemoSubscribers.filter(sub => sub.date === "2025-05-21").length;
+    userData.dailyDemoMay2025["22"] = Math.round(Math.random() * 3) + 1;
+
+    return userData;
+}
+
+function updateUserSections(pageId) {
+    const userData = generateUserData();
+
+    if (pageId === "total-users") {
+        const totalUsers = (userData.total.yearly[2023].paid + userData.total.yearly[2023].demo) +
+                           (userData.total.yearly[2024].paid + userData.total.yearly[2024].demo) +
+                           (userData.total.yearly[2025].paid + userData.total.yearly[2025].demo);
+        document.getElementById("total-users-amount").textContent = totalUsers;
+        document.getElementById("year-2023-users").textContent = userData.total.yearly[2023].paid + userData.total.yearly[2023].demo;
+        document.getElementById("year-2024-users").textContent = userData.total.yearly[2024].paid + userData.total.yearly[2024].demo;
+        document.getElementById("year-2025-users").textContent = userData.total.yearly[2025].paid + userData.total.yearly[2025].demo;
+        document.getElementById("q1-2025-users").textContent = userData.total.quarterly2025.q1.paid + userData.total.quarterly2025.q1.demo;
+        document.getElementById("q2-2025-users").textContent = userData.total.quarterly2025.q2.paid + userData.total.quarterly2025.q2.demo;
+
+        new Chart(document.getElementById("yearly-users-chart"), {
+            type: "bar",
+            data: {
+                labels: ["2023", "2024", "2025"],
+                datasets: [
+                    {
+                        label: "Paid Users",
+                        data: [userData.total.yearly[2023].paid, userData.total.yearly[2024].paid, userData.total.yearly[2025].paid],
+                        backgroundColor: "#007bff",
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Demo Users",
+                        data: [userData.total.yearly[2023].demo, userData.total.yearly[2024].demo, userData.total.yearly[2025].demo],
+                        backgroundColor: "#28a745",
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Yearly Users Trend" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("quarterly-users-chart"), {
+            type: "bar",
+            data: {
+                labels: ["Q1 2025", "Q2 2025"],
+                datasets: [
+                    {
+                        label: "Paid Users",
+                        data: [userData.total.quarterly2025.q1.paid, userData.total.quarterly2025.q2.paid],
+                        backgroundColor: "#6a0dad",
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Demo Users",
+                        data: [userData.total.quarterly2025.q1.demo, userData.total.quarterly2025.q2.demo],
+                        backgroundColor: "#ffca28",
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Quarterly Users (2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("plan-type-users-chart"), {
+            type: "pie",
+            data: {
+                labels: ["Daily", "Monthly", "Daily Demo"],
+                datasets: [{
+                    label: "Users by Plan Type",
+                    data: [userData.total.planBreakdown.Daily, userData.total.planBreakdown.Monthly, userData.total.planBreakdown.DailyDemo],
+                    backgroundColor: ["#007bff", "#28a745", "#ff6f61"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Users by Plan Type" } }
+            }
+        });
+
+        new Chart(document.getElementById("cumulative-users-chart"), {
+            type: "line",
+            data: {
+                labels: ["2023", "2024", "2025"],
+                datasets: [{
+                    label: "Cumulative Users",
+                    data: [
+                        userData.total.yearly[2023].paid + userData.total.yearly[2023].demo,
+                        (userData.total.yearly[2023].paid + userData.total.yearly[2023].demo) + (userData.total.yearly[2024].paid + userData.total.yearly[2024].demo),
+                        (userData.total.yearly[2023].paid + userData.total.yearly[2023].demo) + (userData.total.yearly[2024].paid + userData.total.yearly[2024].demo) + (userData.total.yearly[2025].paid + userData.total.yearly[2025].demo)
+                    ],
+                    borderColor: "#6a0dad",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Cumulative Users Over Years" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    } else if (pageId === "monthly-paid-users") {
+        document.getElementById("jan-2025-users").textContent = userData.monthlyPaid2025.jan;
+        document.getElementById("feb-2025-users").textContent = userData.monthlyPaid2025.feb;
+        document.getElementById("mar-2025-users").textContent = userData.monthlyPaid2025.mar;
+        document.getElementById("apr-2025-users").textContent = userData.monthlyPaid2025.apr;
+
+        new Chart(document.getElementById("monthly-users-trend-chart"), {
+            type: "line",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Monthly Paid Users",
+                    data: [
+                        userData.monthlyPaid2025.jan,
+                        userData.monthlyPaid2025.feb,
+                        userData.monthlyPaid2025.mar,
+                        userData.monthlyPaid2025.apr
+                    ],
+                    borderColor: "#28a745",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Monthly Paid Users Trend (2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("monthly-plan-users-chart"), {
+            type: "bar",
+            data: {
+                labels: ["Daily", "Monthly"],
+                datasets: [{
+                    label: "Users by Plan (Apr 2025)",
+                    data: [
+                        totalPaidSubscribers.filter(sub => sub.plan === "Daily" && new Date(sub.date).getMonth() === 3).length,
+                        totalPaidSubscribers.filter(sub => sub.plan === "Monthly" && new Date(sub.date).getMonth() === 3).length
+                    ],
+                    backgroundColor: ["#007bff", "#28a745"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Paid Users by Plan (Apr 2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("monthly-users-growth-chart"), {
+            type: "line",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Growth Rate (%)",
+                    data: [
+                        0,
+                        ((userData.monthlyPaid2025.feb - userData.monthlyPaid2025.jan) / userData.monthlyPaid2025.jan * 100) || 0,
+                        ((userData.monthlyPaid2025.mar - userData.monthlyPaid2025.feb) / userData.monthlyPaid2025.feb * 100) || 0,
+                        ((userData.monthlyPaid2025.apr - userData.monthlyPaid2025.mar) / userData.monthlyPaid2025.mar * 100) || 0
+                    ],
+                    borderColor: "#6a0dad",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Paid Users Growth Rate (2025)" } }
+            }
+        });
+
+        new Chart(document.getElementById("monthly-users-distribution-chart"), {
+            type: "pie",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Distribution",
+                    data: [
+                        userData.monthlyPaid2025.jan,
+                        userData.monthlyPaid2025.feb,
+                        userData.monthlyPaid2025.mar,
+                        userData.monthlyPaid2025.apr
+                    ],
+                    backgroundColor: ["#ff6f61", "#28a745", "#007bff", "#6a0dad"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Monthly Paid Users Distribution" } }
+            }
+        });
+    } else if (pageId === "weekly-paid-users") {
+        const weeklyTotal = Object.values(userData.weeklyPaidApril2025).reduce((a, b) => a + b, 0);
+        document.getElementById("weekly-users-amount").textContent = weeklyTotal;
+        document.getElementById("week1-apr-users").textContent = userData.weeklyPaidApril2025.week1;
+        document.getElementById("week2-apr-users").textContent = userData.weeklyPaidApril2025.week2;
+        document.getElementById("week3-apr-users").textContent = userData.weeklyPaidApril2025.week3;
+        document.getElementById("week4-apr-users").textContent = userData.weeklyPaidApril2025.week4;
+
+        new Chart(document.getElementById("weekly-users-trend-chart"), {
+            type: "line",
+            data: {
+                labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+                datasets: [{
+                    label: "Weekly Paid Users",
+                    data: [
+                        userData.weeklyPaidApril2025.week1,
+                        userData.weeklyPaidApril2025.week2,
+                        userData.weeklyPaidApril2025.week3,
+                        userData.weeklyPaidApril2025.week4
+                    ],
+                    borderColor: "#ff6f61",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Weekly Paid Users Trend (Apr 2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("weekly-plan-users-chart"), {
+            type: "bar",
+            data: {
+                labels: ["Daily", "Monthly"],
+                datasets: [{
+                    label: "Users by Plan (Week 4)",
+                    data: [
+                        totalPaidSubscribers.filter(sub => sub.plan === "Daily" && new Date(sub.date).getDate() >= 22 && new Date(sub.date).getMonth() === 3).length,
+                        totalPaidSubscribers.filter(sub => sub.plan === "Monthly" && new Date(sub.date).getDate() >= 22 && new Date(sub.date).getMonth() === 3).length
+                    ],
+                    backgroundColor: ["#007bff", "#28a745"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Paid Users by Plan (Week 4)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("weekly-users-growth-chart"), {
+            type: "line",
+            data: {
+                labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+                datasets: [{
+                    label: "Growth Rate (%)",
+                    data: [
+                        0,
+                        ((userData.weeklyPaidApril2025.week2 - userData.weeklyPaidApril2025.week1) / userData.weeklyPaidApril2025.week1 * 100) || 0,
+                        ((userData.weeklyPaidApril2025.week3 - userData.weeklyPaidApril2025.week2) / userData.weeklyPaidApril2025.week2 * 100) || 0,
+                        ((userData.weeklyPaidApril2025.week4 - userData.weeklyPaidApril2025.week3) / userData.weeklyPaidApril2025.week3 * 100) || 0
+                    ],
+                    borderColor: "#6a0dad",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Weekly Paid Users Growth Rate" } }
+            }
+        });
+
+        new Chart(document.getElementById("weekly-users-distribution-chart"), {
+            type: "pie",
+            data: {
+                labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+                datasets: [{
+                    label: "Distribution",
+                    data: [
+                        userData.weeklyPaidApril2025.week1,
+                        userData.weeklyPaidApril2025.week2,
+                        userData.weeklyPaidApril2025.week3,
+                        userData.weeklyPaidApril2025.week4
+                    ],
+                    backgroundColor: ["#ff6f61", "#28a745", "#007bff", "#6a0dad"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Weekly Paid Users Distribution" } }
+            }
+        });
+    } else if (pageId === "daily-paid-users") {
+        const dailyTotal = Object.values(userData.dailyPaidMay2025).reduce((a, b) => a + b, 0);
+        document.getElementById("daily-users-amount").textContent = dailyTotal;
+        document.getElementById("day-19-users").textContent = userData.dailyPaidMay2025["19"];
+        document.getElementById("day-20-users").textContent = userData.dailyPaidMay2025["20"];
+        document.getElementById("day-21-users").textContent = userData.dailyPaidMay2025["21"];
+        document.getElementById("day-22-users").textContent = userData.dailyPaidMay2025["22"];
+
+        new Chart(document.getElementById("daily-users-trend-chart"), {
+            type: "line",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Daily Paid Users",
+                    data: [
+                        userData.dailyPaidMay2025["19"],
+                        userData.dailyPaidMay2025["20"],
+                        userData.dailyPaidMay2025["21"],
+                        userData.dailyPaidMay2025["22"]
+                    ],
+                    borderColor: "#007bff",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Paid Users Trend (May 2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("daily-plan-users-chart"), {
+            type: "bar",
+            data: {
+                labels: ["Daily", "Monthly"],
+                datasets: [{
+                    label: "Users by Plan (May 21)",
+                    data: [
+                        totalPaidSubscribers.filter(sub => sub.plan === "Daily" && sub.date === "2025-05-21").length,
+                        totalPaidSubscribers.filter(sub => sub.plan === "Monthly" && sub.date === "2025-05-21").length
+                    ],
+                    backgroundColor: ["#007bff", "#28a745"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Paid Users by Plan (May 21)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("daily-users-growth-chart"), {
+            type: "line",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Growth Rate (%)",
+                    data: [
+                        0,
+                        ((userData.dailyPaidMay2025["20"] - userData.dailyPaidMay2025["19"]) / userData.dailyPaidMay2025["19"] * 100) || 0,
+                        ((userData.dailyPaidMay2025["21"] - userData.dailyPaidMay2025["20"]) / userData.dailyPaidMay2025["20"] * 100) || 0,
+                        ((userData.dailyPaidMay2025["22"] - userData.dailyPaidMay2025["21"]) / userData.dailyPaidMay2025["21"] * 100) || 0
+                    ],
+                    borderColor: "#6a0dad",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Paid Users Growth Rate" } }
+            }
+        });
+
+        new Chart(document.getElementById("daily-users-distribution-chart"), {
+            type: "pie",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Distribution",
+                    data: [
+                        userData.dailyPaidMay2025["19"],
+                        userData.dailyPaidMay2025["20"],
+                        userData.dailyPaidMay2025["21"],
+                        userData.dailyPaidMay2025["22"]
+                    ],
+                    backgroundColor: ["#ff6f61", "#28a745", "#007bff", "#6a0dad"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Paid Users Distribution" } }
+            }
+        });
+    } else if (pageId === "monthly-demo-users") {
+        document.getElementById("jan-2025-demo-users").textContent = userData.monthlyDemo2025.jan;
+        document.getElementById("feb-2025-demo-users").textContent = userData.monthlyDemo2025.feb;
+        document.getElementById("mar-2025-demo-users").textContent = userData.monthlyDemo2025.mar;
+        document.getElementById("apr-2025-demo-users").textContent = userData.monthlyDemo2025.apr;
+
+        new Chart(document.getElementById("monthly-demo-users-trend-chart"), {
+            type: "line",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Monthly Demo Users",
+                    data: [
+                        userData.monthlyDemo2025.jan,
+                        userData.monthlyDemo2025.feb,
+                        userData.monthlyDemo2025.mar,
+                        userData.monthlyDemo2025.apr
+                    ],
+                    borderColor: "#28a745",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Monthly Demo Users Trend (2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("monthly-demo-users-growth-chart"), {
+            type: "line",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Growth Rate (%)",
+                    data: [
+                        0,
+                        ((userData.monthlyDemo2025.feb - userData.monthlyDemo2025.jan) / userData.monthlyDemo2025.jan * 100) || 0,
+                        ((userData.monthlyDemo2025.mar - userData.monthlyDemo2025.feb) / userData.monthlyDemo2025.feb * 100) || 0,
+                        ((userData.monthlyDemo2025.apr - userData.monthlyDemo2025.mar) / userData.monthlyDemo2025.mar * 100) || 0
+                    ],
+                    borderColor: "#6a0dad",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Demo Users Growth Rate (2025)" } }
+            }
+        });
+
+        new Chart(document.getElementById("monthly-demo-users-distribution-chart"), {
+            type: "pie",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Distribution",
+                    data: [
+                        userData.monthlyDemo2025.jan,
+                        userData.monthlyDemo2025.feb,
+                        userData.monthlyDemo2025.mar,
+                        userData.monthlyDemo2025.apr
+                    ],
+                    backgroundColor: ["#ff6f61", "#28a745", "#007bff", "#6a0dad"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Monthly Demo Users Distribution" } }
+            }
+        });
+
+        new Chart(document.getElementById("monthly-demo-users-conversion-chart"), {
+            type: "bar",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr"],
+                datasets: [{
+                    label: "Converted to Paid (%)",
+                    data: [
+                        (Math.random() * 10 + 5).toFixed(1),
+                        (Math.random() * 10 + 5).toFixed(1),
+                        (Math.random() * 10 + 5).toFixed(1),
+                        (Math.random() * 10 + 5).toFixed(1)
+                    ],
+                    backgroundColor: "#ffca28",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Demo to Paid Conversion Rate" } },
+                scales: { y: { beginAtZero: true, max: 100 } }
+            }
+        });
+    } else if (pageId === "daily-demo-users") {
+        const dailyTotal = Object.values(userData.dailyDemoMay2025).reduce((a, b) => a + b, 0);
+        document.getElementById("daily-demo-users-amount").textContent = dailyTotal;
+        document.getElementById("day-19-demo-users").textContent = userData.dailyDemoMay2025["19"];
+        document.getElementById("day-20-demo-users").textContent = userData.dailyDemoMay2025["20"];
+        document.getElementById("day-21-demo-users").textContent = userData.dailyDemoMay2025["21"];
+        document.getElementById("day-22-demo-users").textContent = userData.dailyDemoMay2025["22"];
+
+        new Chart(document.getElementById("daily-demo-users-trend-chart"), {
+            type: "line",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Daily Demo Users",
+                    data: [
+                        userData.dailyDemoMay2025["19"],
+                        userData.dailyDemoMay2025["20"],
+                        userData.dailyDemoMay2025["21"],
+                        userData.dailyDemoMay2025["22"]
+                    ],
+                    borderColor: "#007bff",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Demo Users Trend (May 2025)" } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        new Chart(document.getElementById("daily-demo-users-growth-chart"), {
+            type: "line",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Growth Rate (%)",
+                    data: [
+                        0,
+                        ((userData.dailyDemoMay2025["20"] - userData.dailyDemoMay2025["19"]) / userData.dailyDemoMay2025["19"] * 100) || 0,
+                        ((userData.dailyDemoMay2025["21"] - userData.dailyDemoMay2025["20"]) / userData.dailyDemoMay2025["20"] * 100) || 0,
+                        ((userData.dailyDemoMay2025["22"] - userData.dailyDemoMay2025["21"]) / userData.dailyDemoMay2025["21"] * 100) || 0
+                    ],
+                    borderColor: "#6a0dad",
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Demo Users Growth Rate" } }
+            }
+        });
+
+        new Chart(document.getElementById("daily-demo-users-distribution-chart"), {
+            type: "pie",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Distribution",
+                    data: [
+                        userData.dailyDemoMay2025["19"],
+                        userData.dailyDemoMay2025["20"],
+                        userData.dailyDemoMay2025["21"],
+                        userData.dailyDemoMay2025["22"]
+                    ],
+                    backgroundColor: ["#ff6f61", "#28a745", "#007bff", "#6a0dad"],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Demo Users Distribution" } }
+            }
+        });
+
+        new Chart(document.getElementById("daily-demo-users-conversion-chart"), {
+            type: "bar",
+            data: {
+                labels: ["May 19", "May 20", "May 21", "May 22"],
+                datasets: [{
+                    label: "Converted to Paid (%)",
+                    data: [
+                        (Math.random() * 10 + 5).toFixed(1),
+                        (Math.random() * 10 + 5).toFixed(1),
+                        (Math.random() * 10 + 5).toFixed(1),
+                        (Math.random() * 10 + 5).toFixed(1)
+                    ],
+                    backgroundColor: "#ffca28",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: "Daily Demo to Paid Conversion" } },
+                scales: { y: { beginAtZero: true, max: 100 } }
+            }
+        });
+    }
+}
+
+
+
+
+
+
+
+ const dailyPlanPriceINR = 199;
+        const monthlyPlanPriceINR = 599;
+
+    
+        // Random data for Monthly Profit (Jan 2025 - Apr 2025)
+        const monthlyData = {
+            "2025-01": { daily: 9, monthly: 19 },
+            "2025-02": { daily: 9, monthly: 17 },
+            "2025-03": { daily: 7, monthly: 14 },
+            "2025-04": { daily: 10, monthly: 19 }
+        };
+
+        // Random data for Weekly Profit (April 2025)
+        const weeklyData = {
+            "Week 1": { daily: 10, monthly: 20, startDate: "2025-04-01", endDate: "2025-04-07" },
+            "Week 2": { daily: 8, monthly: 19, startDate: "2025-04-08", endDate: "2025-04-14" },
+            "Week 3": { daily: 7, monthly: 20, startDate: "2025-04-15", endDate: "2025-04-21" },
+            "Week 4": { daily: 8, monthly: 18, startDate: "2025-04-22", endDate: "2025-04-30" }
+        };
+
+        // Random data for Daily Profit (May 19-22, 2025)
+        const dailyData = {
+            "2025-05-19": { daily: 1, monthly: 9 },
+            "2025-05-20": { daily: 4, monthly: 5 },
+            "2025-05-21": { daily: 5, monthly: 7 },
+            "2025-05-22": { daily: 3, monthly: 9 }
+        };
+
+
+        // Profit calculation functions
+        function getTotalProfit() {
+            return totalPaidSubscribers.reduce((total, sub) => {
+                return total + (sub.plan === "Daily" ? dailyPlanPriceINR : monthlyPlanPriceINR);
+            }, 0);
+        }
+
+        function getYearlyProfit(year) {
+            return totalPaidSubscribers
+                .filter(sub => sub.date.startsWith(year))
+                .reduce((total, sub) => total + (sub.plan === "Daily" ? dailyPlanPriceINR : monthlyPlanPriceINR), 0);
+        }
+
+        function getQuarterlyProfit(year, quarter) {
+            const quarterMonths = {
+                1: ["10", "12", "13"],
+                2: ["14", "15", "16"],
+                3: ["17", "18", "19"],
+                4: ["10", "11", "12"]
+            };
+            return totalPaidSubscribers
+                .filter(sub => {
+                    const [subYear, subMonth] = sub.date.split("-");
+                    return subYear === year && quarterMonths[quarter].includes(subMonth);
+                })
+                .reduce((total, sub) => total + (sub.plan === "Daily" ? dailyPlanPriceINR : monthlyPlanPriceINR), 0);
+        }
+
+        function getPlanTypeProfit(plan) {
+            return totalPaidSubscribers
+                .filter(sub => sub.plan === plan)
+                .reduce((total, sub) => total + (sub.plan === "Daily" ? dailyPlanPriceINR : monthlyPlanPriceINR), 0);
+        }
+
+        // Update profit sections based on page
+        function updateProfitSections(pageId) {
+            if (pageId === "total-profit") {
+                // Total Profit calculations
+                const totalProfit = getTotalProfit();
+                const profit2023 = getYearlyProfit("2023");
+                const profit2024 = getYearlyProfit("2024");
+                const profit2025 = getYearlyProfit("2025");
+                const q1Profit2025 = getQuarterlyProfit("2025", 1);
+                const q2Profit2025 = getQuarterlyProfit("2025", 2);
+
+                document.getElementById("total-profit-amount").textContent = `₹${totalProfit.toLocaleString('en-IN')}`;
+                document.getElementById("year-2023-profit").textContent = `₹${profit2023.toLocaleString('en-IN')}`;
+                document.getElementById("year-2024-profit").textContent = `₹${profit2024.toLocaleString('en-IN')}`;
+                document.getElementById("year-2025-profit").textContent = `₹${profit2025.toLocaleString('en-IN')}`;
+                document.getElementById("q1-2025-profit").textContent = `₹${q1Profit2025.toLocaleString('en-IN')}`;
+                document.getElementById("q2-2025-profit").textContent = `₹${q2Profit2025.toLocaleString('en-IN')}`;
+
+                // Yearly Profit Chart (2023-2025) - Bar Chart
+                new Chart(document.getElementById("yearly-profit-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['2023', '2024', '2025'],
+                        datasets: [{
+                            label: 'Profit (₹)',
+                            data: [profit2023, profit2024, profit2025],
+                            backgroundColor: ['#ff6f61', '#28a745', '#007bff']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Yearly Profit Trend (2023-2025)', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Quarterly Profit Chart (2025) - Bar Chart
+                new Chart(document.getElementById("quarterly-profit-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Q1 2025', 'Q2 2025 (Apr-May)'],
+                        datasets: [{
+                            label: 'Profit (₹)',
+                            data: [q1Profit2025, q2Profit2025],
+                            backgroundColor: ['#6a0dad', '#ffca28']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Quarterly Profit (2025)', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Profit by Plan Type - Pie Chart
+                const dailyProfit = getPlanTypeProfit("Daily");
+                const monthlyProfit = getPlanTypeProfit("Monthly");
+                new Chart(document.getElementById("plan-type-profit-chart"), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Daily Plan', 'Monthly Plan'],
+                        datasets: [{
+                            label: 'Profit (₹)',
+                            data: [dailyProfit, monthlyProfit],
+                            backgroundColor: ['#007bff', '#28a745'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Profit by Plan Type', font: { size: 14 } }
+                        }
+                    }
+                });
+
+                // Cumulative Profit Over Time - Line Chart
+                const cumulativeProfits = [];
+                let runningTotal = 0;
+                const sortedSubscribers = totalPaidSubscribers.sort((a, b) => new Date(a.date) - new Date(b.date));
+                const profitDates = [...new Set(sortedSubscribers.map(sub => sub.date))];
+                profitDates.forEach(date => {
+                    const profitOnDate = sortedSubscribers
+                        .filter(sub => sub.date === date)
+                        .reduce((total, sub) => total + (sub.plan === "Daily" ? dailyPlanPriceINR : monthlyPlanPriceINR), 0);
+                    runningTotal += profitOnDate;
+                    cumulativeProfits.push(runningTotal);
+                });
+                new Chart(document.getElementById("cumulative-profit-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: profitDates,
+                        datasets: [{
+                            label: 'Cumulative Profit (₹)',
+                            data: cumulativeProfits,
+                            borderColor: '#ff5722',
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Cumulative Profit Over Time', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            },
+                            x: {
+                                ticks: { maxTicksLimit: 10 }
+                            }
+                        }
+                    }
+                });
+            } else if (pageId === "monthly-profit") {
+                // Calculate monthly profits
+                const monthlyProfits = {};
+                const monthlySubscriberCounts = {};
+                const monthlyDailyProfits = {};
+                const monthlyMonthlyProfits = {};
+                Object.keys(monthlyData).forEach(month => {
+                    const dailyProfit = monthlyData[month].daily * dailyPlanPriceINR;
+                    const monthlyProfit = monthlyData[month].monthly * monthlyPlanPriceINR;
+                    monthlyProfits[month] = dailyProfit + monthlyProfit;
+                    monthlySubscriberCounts[month] = monthlyData[month].daily + monthlyData[month].monthly;
+                    monthlyDailyProfits[month] = dailyProfit;
+                    monthlyMonthlyProfits[month] = monthlyProfit;
+                });
+
+                // Update profit cards
+                document.getElementById("jan-2025-profit").textContent = `₹${monthlyProfits["2025-01"].toLocaleString('en-IN')}`;
+                document.getElementById("feb-2025-profit").textContent = `₹${monthlyProfits["2025-02"].toLocaleString('en-IN')}`;
+                document.getElementById("mar-2025-profit").textContent = `₹${monthlyProfits["2025-03"].toLocaleString('en-IN')}`;
+                document.getElementById("apr-2025-profit").textContent = `₹${monthlyProfits["2025-04"].toLocaleString('en-IN')}`;
+
+                // Monthly Profit Trend - Line Chart
+                new Chart(document.getElementById("monthly-profit-trend-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025'],
+                        datasets: [{
+                            label: 'Profit (₹)',
+                            data: [
+                                monthlyProfits["2025-01"],
+                                monthlyProfits["2025-02"],
+                                monthlyProfits["2025-03"],
+                                monthlyProfits["2025-04"]
+                            ],
+                            borderColor: '#007bff',
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Monthly Profit Trend', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Profit by Plan Type per Month - Stacked Bar Chart
+                new Chart(document.getElementById("monthly-plan-profit-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025'],
+                        datasets: [
+                            {
+                                label: 'Daily Plan',
+                                data: [
+                                    monthlyDailyProfits["2025-01"],
+                                    monthlyDailyProfits["2025-02"],
+                                    monthlyDailyProfits["2025-03"],
+                                    monthlyDailyProfits["2025-04"]
+                                ],
+                                backgroundColor: '#007bff'
+                            },
+                            {
+                                label: 'Monthly Plan',
+                                data: [
+                                    monthlyMonthlyProfits["2025-01"],
+                                    monthlyMonthlyProfits["2025-02"],
+                                    monthlyMonthlyProfits["2025-03"],
+                                    monthlyMonthlyProfits["2025-04"]
+                                ],
+                                backgroundColor: '#28a745'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Profit by Plan Type', font: { size: 14 } }
+                        },
+                        scales: {
+                            x: { stacked: true },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Subscriber Count per Month - Bar Chart
+                new Chart(document.getElementById("monthly-subscriber-count-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025'],
+                        datasets: [{
+                            label: 'Subscribers',
+                            data: [
+                                monthlySubscriberCounts["2025-01"],
+                                monthlySubscriberCounts["2025-02"],
+                                monthlySubscriberCounts["2025-03"],
+                                monthlySubscriberCounts["2025-04"]
+                            ],
+                            backgroundColor: '#6a0dad'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Subscriber Count per Month', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Monthly Profit Growth Rate - Line Chart
+                const profitGrowth = [0];
+                for (let i = 1; i < Object.keys(monthlyProfits).length; i++) {
+                    const prevProfit = Object.values(monthlyProfits)[i - 1];
+                    const currProfit = Object.values(monthlyProfits)[i];
+                    const growth = prevProfit > 0 ? ((currProfit - prevProfit) / prevProfit * 100).toFixed(2) : 0;
+                    profitGrowth.push(parseFloat(growth));
+                }
+                new Chart(document.getElementById("monthly-profit-growth-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025'],
+                        datasets: [{
+                            label: 'Growth Rate (%)',
+                            data: profitGrowth,
+                            borderColor: '#ff5722',
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Monthly Profit Growth Rate (%)', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { callback: value => `${value}%` }
+                            }
+                        }
+                    }
+                });
+            } else if (pageId === "weekly-profit") {
+                // Calculate weekly profits
+                const weeklyProfits = {};
+                const weeklySubscriberCounts = {};
+                const weeklyDailyProfits = {};
+                const weeklyMonthlyProfits = {};
+                Object.keys(weeklyData).forEach(week => {
+                    const dailyProfit = weeklyData[week].daily * dailyPlanPriceINR;
+                    const monthlyProfit = weeklyData[week].monthly * monthlyPlanPriceINR;
+                    weeklyProfits[week] = dailyProfit + monthlyProfit;
+                    weeklySubscriberCounts[week] = weeklyData[week].daily + weeklyData[week].monthly;
+                    weeklyDailyProfits[week] = dailyProfit;
+                    weeklyMonthlyProfits[week] = monthlyProfit;
+                });
+
+                const totalWeeklyProfit = Object.values(weeklyProfits).reduce((sum, profit) => sum + profit, 0);
+
+                // Update summary and profit cards
+                document.getElementById("weekly-profit-amount").textContent = `₹${totalWeeklyProfit.toLocaleString('en-IN')}`;
+                document.getElementById("week1-apr-profit").textContent = `₹${weeklyProfits["Week 1"].toLocaleString('en-IN')}`;
+                document.getElementById("week2-apr-profit").textContent = `₹${weeklyProfits["Week 2"].toLocaleString('en-IN')}`;
+                document.getElementById("week3-apr-profit").textContent = `₹${weeklyProfits["Week 3"].toLocaleString('en-IN')}`;
+                document.getElementById("week4-apr-profit").textContent = `₹${weeklyProfits["Week 4"].toLocaleString('en-IN')}`;
+
+                // Weekly Profit Trend - Line Chart
+                new Chart(document.getElementById("weekly-profit-trend-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Profit (₹)',
+                            data: [
+                                weeklyProfits["Week 1"],
+                                weeklyProfits["Week 2"],
+                                weeklyProfits["Week 3"],
+                                weeklyProfits["Week 4"]
+                            ],
+                            borderColor: '#28a745',
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Weekly Profit Trend (Apr 2025)', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Weekly Profit by Plan Type - Stacked Bar Chart
+                new Chart(document.getElementById("weekly-plan-profit-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [
+                            {
+                                label: 'Daily Plan',
+                                data: [
+                                    weeklyDailyProfits["Week 1"],
+                                    weeklyDailyProfits["Week 2"],
+                                    weeklyDailyProfits["Week 3"],
+                                    weeklyDailyProfits["Week 4"]
+                                ],
+                                backgroundColor: '#007bff'
+                            },
+                            {
+                                label: 'Monthly Plan',
+                                data: [
+                                    weeklyMonthlyProfits["Week 1"],
+                                    weeklyMonthlyProfits["Week 2"],
+                                    weeklyMonthlyProfits["Week 3"],
+                                    weeklyMonthlyProfits["Week 4"]
+                                ],
+                                backgroundColor: '#28a745'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Profit by Plan Type', font: { size: 14 } }
+                        },
+                        scales: {
+                            x: { stacked: true },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Weekly Subscriber Count - Bar Chart
+                new Chart(document.getElementById("weekly-subscriber-count-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Subscribers',
+                            data: [
+                                weeklySubscriberCounts["Week 1"],
+                                weeklySubscriberCounts["Week 2"],
+                                weeklySubscriberCounts["Week 3"],
+                                weeklySubscriberCounts["Week 4"]
+                            ],
+                            backgroundColor: '#ff6f61'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Subscriber Count per Week', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Weekly Profit Distribution - Doughnut Chart
+                new Chart(document.getElementById("weekly-profit-distribution-chart"), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Profit Distribution',
+                            data: [
+                                weeklyProfits["Week 1"],
+                                weeklyProfits["Week 2"],
+                                weeklyProfits["Week 3"],
+                                weeklyProfits["Week 4"]
+                            ],
+                            backgroundColor: ['#ff6f61', '#28a745', '#007bff', '#ffca28'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Profit Distribution Across Weeks', font: { size: 14 } }
+                        }
+                    }
+                });
+            } else if (pageId === "daily-profit") {
+                // Calculate daily profits
+                const dailyProfits = {};
+                const dailySubscriberCounts = {};
+                const dailyDailyProfits = {};
+                const dailyMonthlyProfits = {};
+                Object.keys(dailyData).forEach(date => {
+                    const dailyProfit = dailyData[date].daily * dailyPlanPriceINR;
+                    const monthlyProfit = dailyData[date].monthly * monthlyPlanPriceINR;
+                    dailyProfits[date] = dailyProfit + monthlyProfit;
+                    dailySubscriberCounts[date] = dailyData[date].daily + dailyData[date].monthly;
+                    dailyDailyProfits[date] = dailyProfit;
+                    dailyMonthlyProfits[date] = monthlyProfit;
+                });
+
+                const totalDailyProfit = Object.values(dailyProfits).reduce((sum, profit) => sum + profit, 0);
+
+                // Update summary
+                document.getElementById("daily-profit-amount").textContent = `₹${totalDailyProfit.toLocaleString('en-IN')}`;
+
+                // Daily Profit Trend - Line Chart
+                new Chart(document.getElementById("daily-profit-trend-chart"), {
+                    type: 'line',
+                    data: {
+                        labels: ['May 19', 'May 20', 'May 21', 'May 22'],
+                        datasets: [{
+                            label: 'Profit (₹)',
+                            data: [
+                                dailyProfits["2025-05-19"],
+                                dailyProfits["2025-05-20"],
+                                dailyProfits["2025-05-21"],
+                                dailyProfits["2025-05-22"]
+                            ],
+                            borderColor: '#ff5722',
+                            fill: false,
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Daily Profit Trend', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Daily Profit by Plan Type - Stacked Bar Chart
+                new Chart(document.getElementById("daily-plan-profit-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['May 19', 'May 20', 'May 21', 'May 22'],
+                        datasets: [
+                            {
+                                label: 'Daily Plan',
+                                data: [
+                                    dailyDailyProfits["2025-05-19"],
+                                    dailyDailyProfits["2025-05-20"],
+                                    dailyDailyProfits["2025-05-21"],
+                                    dailyDailyProfits["2025-05-22"]
+                                ],
+                                backgroundColor: '#007bff'
+                            },
+                            {
+                                label: 'Monthly Plan',
+                                data: [
+                                    dailyMonthlyProfits["2025-05-19"],
+                                    dailyMonthlyProfits["2025-05-20"],
+                                    dailyMonthlyProfits["2025-05-21"],
+                                    dailyMonthlyProfits["2025-05-22"]
+                                ],
+                                backgroundColor: '#28a745'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Profit by Plan Type', font: { size: 14 } }
+                        },
+                        scales: {
+                            x: { stacked: true },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { callback: value => `₹${value.toLocaleString('en-IN')}` }
+                            }
+                        }
+                    }
+                });
+
+                // Daily Subscriber Count - Bar Chart
+                new Chart(document.getElementById("daily-subscriber-count-chart"), {
+                    type: 'bar',
+                    data: {
+                        labels: ['May 19', 'May 20', 'May 21', 'May 22'],
+                        datasets: [{
+                            label: 'Subscribers',
+                            data: [
+                                dailySubscriberCounts["2025-05-19"],
+                                dailySubscriberCounts["2025-05-20"],
+                                dailySubscriberCounts["2025-05-21"],
+                                dailySubscriberCounts["2025-05-22"]
+                            ],
+                            backgroundColor: '#ffca28'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'Subscriber Count per Day', font: { size: 14 } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                // Daily Profit Share - Pie Chart
+                new Chart(document.getElementById("daily-profit-share-chart"), {
+                    type: 'pie',
+                    data: {
+                        labels: ['May 19', 'May 20', 'May 21', 'May 22'],
+                        datasets: [{
+                            label: 'Profit Share',
+                            data: [
+                                dailyProfits["2025-05-19"],
+                                dailyProfits["2025-05-20"],
+                                dailyProfits["2025-05-21"],
+                                dailyProfits["2025-05-22"]
+                            ],
+                            backgroundColor: ['#ff6f61', '#28a745', '#007bff', '#ffca28'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: 'Profit Share Across Days', font: { size: 14 } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Load default page
+        document.querySelector(".header-links a.active").click();
+    
+        
+
+    </script>
+</body>
+</html>
