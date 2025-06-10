@@ -1,1 +1,2 @@
-https://github.io/abubakar0221/sample/sample.html
+ https://abubakar0221.github.io/sample/sample.html
+ 
